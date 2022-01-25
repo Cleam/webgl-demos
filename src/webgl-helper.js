@@ -26,3 +26,12 @@ export function createProgram(gl, vertexShader, fragmentShader) {
   gl.linkProgram(program);
   return program;
 }
+
+export function resizeCanvas(canvas, width, height) {
+  if (canvas.width !== width) {
+    canvas.width = width ? width : window.innerWidth;
+  }
+  if (canvas.height !== height) {
+    canvas.height = height ? height : window.innerHeight;
+  }
+}
