@@ -16,12 +16,15 @@ export function createShader(gl, shaderType, shaderSource) {
   return shader;
 }
 
-export function createProgram(gl, vertexShader, fragmentShader) {
+export function createProgram(gl, ...shaders) {
   // 创建着色器程序
   const program = gl.createProgram();
   // 将顶点着色器、片元着色器挂载到着色器程序上
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
+  // gl.attachShader(program, vertexShader);
+  // gl.attachShader(program, fragmentShader);
+  shaders.forEach((shader) => {
+    gl.attachShader(program, shader);
+  });
   // 链接着色器程序
   gl.linkProgram(program);
   return program;

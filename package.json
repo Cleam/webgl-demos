@@ -1,0 +1,23 @@
+{
+  "name": "webgl-demos",
+  "version": "1.0.0",
+  "description": "[《WebGL 入门与实践》](https://juejin.cn/book/6844733755580481543) - 学习笔记",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cleam/webgl-demos.git"
+  },
+  "keywords": [],
+  "author": "lizhigao <lizhigao1231@163.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Cleam/webgl-demos/issues"
+  },
+  "homepage": "https://github.com/Cleam/webgl-demos#readme",
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  }
+}

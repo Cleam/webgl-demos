@@ -1,6 +1,8 @@
 import { init } from '../common.js';
 import { randomColor } from '../webgl-helper.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
+import { throttle } from '/node_modules/lodash-es/lodash.js';
+
 const { gl, program, canvas } = init(shaderVertex, shaderFragment);
 
 // 定义三角形的三个顶点
@@ -76,18 +78,22 @@ gl.vertexAttribPointer (target, size, type, normalize, stride, offset)。
 
 // ===== example 2： 通过点击三个点绘制三角形
 
-canvas.addEventListener('click', (e) => {
-  const x = e.pageX;
-  const y = e.pageY;
-  positions.push(x, y);
-  if (positions.length % 6 == 0) {
-    // 向缓冲区中复制新的顶点数据。
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-    const { r, g, b, a } = randomColor();
-    gl.uniform4f(u_Color, r, g, b, a);
-    render(gl);
-  }
-});
+canvas.addEventListener(
+  'click',
+  throttle((e) => {
+    const x = e.pageX;
+    const y = e.pageY;
+    // console.log(x, y);
+    positions.push(x, y);
+    if (positions.length % 6 == 0) {
+      // 向缓冲区中复制新的顶点数据。
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+      const { r, g, b, a } = randomColor();
+      gl.uniform4f(u_Color, r, g, b, a);
+      render(gl);
+    }
+  }, 100)
+);
 
 // 渲染
 function render(gl) {
