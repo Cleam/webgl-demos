@@ -1,13 +1,7 @@
 import { shaderVertex, shaderFragment } from './index.glsl.js';
-import { getCanvas, getWebGLContext, createShader, createProgram } from '../webgl-helper.js';
+import { createShader, createProgram } from '../webgl-helper.js';
 
-const canvas = getCanvas('#canvas');
-resizeCanvas(canvas);
-window.addEventListener('resize', () => {
-  resizeCanvas(canvas);
-});
-
-const gl = getWebGLContext(canvas);
+const { gl, program } = init(shaderVertex, shaderFragment);
 
 const vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderVertex);
 const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderFragment);
