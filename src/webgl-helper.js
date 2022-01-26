@@ -35,3 +35,12 @@ export function resizeCanvas(canvas, width, height) {
     canvas.height = height ? height : window.innerHeight;
   }
 }
+
+export function randomColor() {
+  return {
+    r: Math.floor(Math.random() * 255),
+    g: Math.floor(Math.random() * 255),
+    b: Math.floor(Math.random() * 255),
+    a: Number(Math.random().toFixed(1)),
+  };
+}

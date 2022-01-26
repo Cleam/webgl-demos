@@ -46,3 +46,32 @@
   - gl.POINTS: 将绘制图元类型设置成点图元。
 
 本节例子的坐标系转换我们是在着色器阶段完成的，事实上，我们通常在 JavaScript 上计算出转换矩阵，然后将转换矩阵连同顶点信息一并传递给着色器。
+
+## d3 - 绘制三角形
+
+WebGL 的基本图元包含点、线段、三角形，而三角形又分为三类
+
+- 基本三角形: `绘制三角形的数量 = 顶点数 / 3`
+![d3_01](./src/assets/d3_01.awebp)
+
+- 三角带：`绘制三角形的数量 = 顶点数 - 2`
+![d3_02](./src/assets/d3_02.awebp)
+
+- 三角扇：`绘制三角形的数量 = 顶点数 - 2`
+![d3_03](./src/assets/d3_03.awebp)
+
+- 三角形图元分类
+  - gl.TRIANGLES：基本三角形。
+  - gl.TRIANGLE_STRIP：三角带。
+  - gl.TRIANGLE_FAN：三角扇。
+- 类型化数组的作用。
+  - Float32Array：32位浮点数组。
+- 使用缓冲区传递数据。
+  - gl.createBuffer：创建buffer。
+  - gl.bindBuffer：绑定某个缓冲区对象为当前缓冲区。
+  - gl.bufferData：往缓冲区中复制数据。
+  - gl.enableVertexAttribArray：启用顶点属性。
+  - gl.vertexAttribPointer：设置顶点属性从缓冲区中读取数据的方式。
+- 动态绘制三角形。
+  - 改变顶点信息，然后通过缓冲区将改变后的顶点信息传递到着色器，重新绘制三角形。
+

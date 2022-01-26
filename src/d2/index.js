@@ -5,6 +5,7 @@ import {
   createShader,
   createProgram,
   resizeCanvas,
+  randomColor,
 } from '../webgl-helper.js';
 
 const canvas = getCanvas('#canvas');
@@ -63,12 +64,3 @@ canvas.addEventListener('click', (e) => {
     gl.drawArrays(gl.POINTS, 0, 1);
   }
 });
-
-function randomColor() {
-  return {
-    r: Math.floor(Math.random() * 255),
-    g: Math.floor(Math.random() * 255),
-    b: Math.floor(Math.random() * 255),
-    a: Number(Math.random().toFixed(1)),
-  };
-}
