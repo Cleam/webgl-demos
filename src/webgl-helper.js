@@ -1,5 +1,5 @@
 export function getCanvas(id) {
-  return document.querySelector('#canvas');
+  return document.querySelector(id);
 }
 
 export function getWebGLContext(canvas) {
