@@ -19,7 +19,8 @@ gl.uniform4f(u_Color, r, g, b, a);
 
 // 获取变量 a_Position
 const a_Position = gl.getAttribLocation(program, 'a_Position');
-// 我们需要告诉 WebGL 如何从之前创建的缓冲区中获取数据，并且传递给顶点着色器中的 a_Position 属性。 那么，首先启用对应属性 a_Position：
+// 我们需要告诉 WebGL 如何从之前创建的缓冲区中获取数据，并且传递给顶点着色器中的 a_Position 属性。 
+// 那么，首先启用对应属性 a_Position：
 gl.enableVertexAttribArray(a_Position);
 
 // 创建缓冲区

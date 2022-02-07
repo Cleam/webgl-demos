@@ -1,3 +1,4 @@
+// 顶点着色器
 export const shaderVertex = `
 // 设置浮点数据类型为中等精度
 precision mediump float;
@@ -13,6 +14,7 @@ void main() {
 }
 `;
 
+// 片元着色器
 export const shaderFragment = `
 // 设置浮点数据类型为中等精度
 precision mediump float;

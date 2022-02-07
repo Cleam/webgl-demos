@@ -75,6 +75,75 @@ WebGL 的基本图元包含点、线段、三角形，而三角形又分为三�
 - 动态绘制三角形。
   - 改变顶点信息，然后通过缓冲区将改变后的顶点信息传递到着色器，重新绘制三角形。
 
+### WebGLRenderingContext.vertexAttribPointer
+
+告诉显卡从当前绑定的缓冲区（bindBuffer()指定的缓冲区）中读取顶点数据。
+
+`void gl.vertexAttribPointer(index, size, type, normalized, stride, offset);`
+
+- index: 指定要修改的顶点属性的索引。
+- size: 指定每个顶点属性的组成数量，必须是1，2，3或4。
+- type: 指定数组中每个元素的数据类型，可能是：
+  - gl.BYTE: 有符号的8位整数，范围[-128, 127]
+  - gl.SHORT: 有符号的16位整数，范围[-32768, 32767]
+  - gl.UNSIGNED_BYTE: 无符号的8位整数，范围[0, 255]
+  - gl.UNSIGNED_SHORT: 无符号的16位整数，范围[0, 65535]
+  - gl.FLOAT: 32位IEEE标准的浮点数
+  - 使用[WebGL2版本](https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL2RenderingContext)的还可以使用以下值：
+    - gl.HALF_FLOAT: 16位IEEE标准的浮点数
+- normalized: 一个[GLboolean](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types)，指定整数数据值在转换为浮点数时是否应规范化到某个范围内。当转换为浮点数时是否应该将整数数值归一化到特定的范围。
+  - 对于类型gl.BYTE和gl.SHORT，如果是true则将值归一化为[-1, 1]
+  - 对于类型gl.UNSIGNED_BYTE和gl.UNSIGNED_SHORT，如果是true则将值归一化为[0, 1]
+  - 对于类型gl.FLOAT和gl.HALF_FLOAT，此参数无效
+- stride: 一个[GLsizei](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types)，以字节为单位指定连续顶点属性开始之间的偏移量(即数组中一行长度)。不能大于255。如果stride为0，则假定该属性是紧密打包的，即不交错属性，每个属性在一个单独的块中，下一个顶点的属性紧跟当前顶点之后。
+- offset: [GLintptr](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types)指定顶点属性数组中第一部分的字节偏移量。必须是类型的字节长度的倍数。
+
+**异常情况（Exceptions）**:
+
+- 如果偏移量`offset`为负，则抛出`gl.INVALID_VALUE`错误。
+- 如果`stride`和`offset`不是数据类型大小的倍数，则抛出`gl.INVALID_OPERATION`错误。
+- 如果没有将WebGLBuffer绑定到`ARRAY_BUFFER`目标，则抛出`gl.INVALID_OPERATION`错误。
+
+### WebGLRenderingContext.bufferData
+
+[WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)的`WebGLRenderingContext.bufferData()`方法创建并初始化了Buffer对象的数据存储区。
+
+```js
+// WebGL1:
+void gl.bufferData(target, size, usage);
+void gl.bufferData(target, ArrayBuffer? srcData, usage);
+void gl.bufferData(target, ArrayBufferView srcData, usage);
+
+// WebGL2:
+void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
+```
+
+- target: [GLenum](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types)指定Buffer绑定点（目标）。可取以下值：
+  - gl.ARRAY_BUFFER: 包含顶点属性的Buffer，如顶点坐标，纹理坐标数据或顶点颜色数据。
+  - gl.ELEMENT_ARRAY_BUFFER: 用于元素索引的Buffer。
+  - 当使用 [WebGL 2 context](https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL2RenderingContext) 时，可以使用以下值：
+    - gl.COPY_READ_BUFFER: 从一个Buffer对象复制到另一个Buffer对象。
+    - gl.COPY_WRITE_BUFFER: 从一个Buffer对象复制到另一个Buffer对象。
+    - gl.TRANSFORM_FEEDBACK_BUFFER: 用于转换反馈操作的Buffer。
+    - gl.UNIFORM_BUFFER: 用于存储统一块的Buffer。
+    - gl.PIXEL_PACK_BUFFER: 用于像素转换操作的Buffer。
+    - gl.PIXEL_UNPACK_BUFFER: 用于像素转换操作的Buffer。
+- size: [GLsizeiptr](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types) 设定Buffer对象的数据存储区大小。
+- srcData: 可选, 一个[ArrayBuffer](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)，[SharedArrayBuffer](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)或者[ArrayBufferView ](https://developer.mozilla.org/zh-CN/docs/Web/API/ArrayBufferView)类型的数组对象，将被复制到Buffer的数据存储区。 如果为null，数据存储区仍会被创建，但是不会进行初始化和定义。
+- usage: [GLenum](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types)指定数据存储区的使用方法。可取以下值：
+  - gl.STATIC_DRAW: 缓冲区的内容可能经常使用，而不会经常更改。内容被写入缓冲区，但不被读取。
+  - gl.DYNAMIC_DRAW: 缓冲区的内容可能经常被使用，并且经常更改。内容被写入缓冲区，但不被读取。
+  - gl.STREAM_DRAW: 缓冲区的内容可能不会经常使用。内容被写入缓冲区，但不被读取。
+  - 当使用 WebGL 2 context 时，可以使用以下值：
+    - gl.STATIC_READ: 缓冲区的内容可能经常使用，而不会经常更改。内容从缓冲区读取，但不写入。
+    - gl.DYNAMIC_READ: 缓冲区的内容可能经常使用，并且经常更改。内容从缓冲区读取，但不写入。
+    - gl.STREAM_READ: 缓冲区的内容可能不会经常使用。内容从缓冲区读取，但不写入。
+    - gl.STATIC_COPY: 缓冲区的内容可能经常使用，而不会经常更改。用户不会从缓冲区读取内容，也不写入。
+    - gl.DYNAMIC_COPY: 缓冲区的内容可能经常使用，并且经常更改。用户不会从缓冲区读取内容，也不写入。
+    - gl.STREAM_COPY: 缓冲区的内容可能不会经常使用。用户不会从缓冲区读取内容，也不写入。
+- srcOffset: [GLuint](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types) 指定读取缓冲时的初始元素索引偏移量。
+- length: 可选, [GLuint](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types) 默认为0。
+
 ## d4 - 绘制线段
 
 线段图元分为三种：
