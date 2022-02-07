@@ -47,3 +47,23 @@ export function randomColor() {
     a: Number(Math.random().toFixed(1)),
   };
 }
+
+export function createBuffer(
+  gl,
+  attribute,
+  size,
+  type = gl.FLOAT,
+  normalized = false,
+  stride = 0,
+  offset = 0
+) {
+  // 我们需要告诉 WebGL 如何从之前创建的缓冲区中获取数据，并且传递给顶点着色器中的xxx属性。
+  // 那么，首先启用对应属性xxx：
+  gl.enableVertexAttribArray(attribute);
+  const buffer = gl.createBuffer();
+  // 将当前 buffer 设置为 buffer ，接下来对 buffer 的操作都是针对 buffer 了。
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  // 设置 attribute 变量读取 buffer 缓冲区的方式。
+  gl.vertexAttribPointer(attribute, size, type, normalized, stride, offset);
+  return buffer;
+}
