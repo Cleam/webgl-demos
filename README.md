@@ -4,12 +4,16 @@
 
 ## d1
 
+> 示例代码：[src/d1](./src/d1/index.html)
+
 - WebGL 是一组图形 API，允许我们使用 JavaScript 控制 GPU 渲染过程，进行 3D 绘图。
 - WebGL 应用由 JavaScript 程序和着色器程序构成。
 - WebGL 如何将 3D 模型数据显示在 2D 屏幕上。
 - WebGL 编程要素：开发者需要针对 CPU 和 GPU 进行编程，CPU 部分是 JavaScript 程序，GPU 部分是着色器程序。
 
 ## d2
+
+> 示例代码：[src/d2](./src/d2/index.html)
 
 - GLSL
   - gl_Position： 内置变量，用来设置顶点坐标。
@@ -48,6 +52,8 @@
 本节例子的坐标系转换我们是在着色器阶段完成的，事实上，我们通常在 JavaScript 上计算出转换矩阵，然后将转换矩阵连同顶点信息一并传递给着色器。
 
 ## d3 - 绘制三角形
+
+> 示例代码：[src/d3](./src/d3/index.html)
 
 WebGL 的基本图元包含点、线段、三角形，而三角形又分为三类
 
@@ -146,8 +152,30 @@ void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
 
 ## d4 - 绘制线段
 
+> 示例代码：[src/d4](./src/d4/index.html)
+
 线段图元分为三种：
 
 - LINES：基本线段。
 - LINE_STRIP：带状线段。
 - LINE_LOOP：环状线段。
+
+## d5 - 绘制渐变三角形
+
+> 示例代码：[src/d5](./src/d5/index.html)
+
+用缓冲区向着色器传递数据有两种方式：
+
+1. 利用一个缓冲区传递多种数据。
+2. 另一种是利用多个缓冲区传递多个数据。
+
+![d5_01](./src/assets/d5_01.awebp)
+
+- 多个buffer传递数据
+
+![positionBuffer](./src/assets/d5_02.awebp)
+![colorBuffer](./src/assets/d5_03.awebp)
+
+- 单个buffer传递数据
+
+![buffer](./src/assets/d5_04.awebp)
