@@ -179,3 +179,10 @@ void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
 - 单个buffer传递数据
 
 ![buffer](./src/assets/d5_04.awebp)
+
+单缓冲区不仅减少了缓冲区的数量，而且减少了传递数据的次数以及复杂度。不同点在于用单个缓冲区传递多类数据时，`gl.vertexAttribPointer`各个参数如何设置，理解这点对我们以后编程十分有用
+
+## d6 - 绘制矩形平面
+
+**请谨记，组成三角形的顶点要按照一定的顺序绘制。默认情况下，WebGL 会认为顶点顺序为逆时针时代表正面，反之则是背面，区分正面、背面的目的在于，如果开启了背面剔除功能的话，背面是不会被绘制的。当我们绘制 3D 形体的时候，这个设置很重要。**
+
