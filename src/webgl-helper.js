@@ -44,7 +44,7 @@ export function randomColor() {
     r: Math.floor(Math.random() * 255),
     g: Math.floor(Math.random() * 255),
     b: Math.floor(Math.random() * 255),
-    a: Number(Math.random().toFixed(1)),
+    a: 1, // Number(Math.random().toFixed(1)),
   };
 }
 
