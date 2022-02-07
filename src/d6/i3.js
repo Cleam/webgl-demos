@@ -15,14 +15,26 @@ const a_Color = gl.getAttribLocation(program, 'a_Color');
 gl.enableVertexAttribArray(a_Position);
 gl.enableVertexAttribArray(a_Color);
 
-// 绘制顶点固定的矩形 - 三角带绘制
+// 绘制顶点固定的矩形
 
+// 三角带，顶点数组
+// prettier-ignore
+// const positions = [
+//   30, 300, 0, 255, 0, 1,   //V0
+//   300, 300, 255, 0, 255, 1,  //V1
+//   30, 30, 255, 255, 0, 1,    //V2
+//   300, 30, 0, 255, 0, 1    //V3
+// ]
+
+// 三角扇，顶点数组
 // prettier-ignore
 const positions = [
-  30, 300, 0, 255, 0, 1,   //V0  
-  300, 300, 255, 0, 255, 1,  //V1
-  30, 30, 255, 255, 0, 1,    //V2
-  300, 30, 0, 255, 0, 1    //V3
+  165, 165, 255, 255, 0, 1, //V0
+  30, 30, 255, 0, 0, 1,    //V1
+  30, 300, 0, 0, 255, 1,   //V2
+  300, 300, 255, 0, 255, 1,  //V3
+  300, 30, 0, 255, 0, 1,   //V4
+  30, 30, 255, 0, 0, 1,    //V1
 ]
 
 const buffer = gl.createBuffer();
@@ -33,4 +45,7 @@ gl.vertexAttribPointer(a_Color, 4, gl.FLOAT, false, 24, 8);
 // 创建并初始化缓冲区
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-gl.drawArrays(gl.TRIANGLE_STRIP, 0, positions.length / 6);
+// 三角带
+// gl.drawArrays(gl.TRIANGLE_STRIP, 0, positions.length / 6);
+// 三角扇
+gl.drawArrays(gl.TRIANGLE_FAN, 0, positions.length / 6);
