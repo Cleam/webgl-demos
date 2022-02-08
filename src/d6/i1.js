@@ -33,8 +33,13 @@ const positions = [
 	300, 300, 255, 0, 0, 1,  //V2
 	30, 30, 0, 255, 0, 1,    //V0
 	300, 300, 0, 255, 0, 1,  //V2
-	300, 30, 0, 255, 0, 1    //V3
+	300, 30, 0, 255, 0, 1,    //V3
 ]
+
+// 开启正反面剔除（多边形剔除功能默认不开启）
+gl.enable(gl.CULL_FACE);
+// 剔除背面
+gl.cullFace(gl.BACK); // 可选值：gl.FRONT gl.BACK gl.FRONT_AND_BACK， 默认值：gl.BACK
 
 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);

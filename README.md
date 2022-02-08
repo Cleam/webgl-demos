@@ -182,7 +182,35 @@ void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
 
 单缓冲区不仅减少了缓冲区的数量，而且减少了传递数据的次数以及复杂度。不同点在于用单个缓冲区传递多类数据时，`gl.vertexAttribPointer`各个参数如何设置，理解这点对我们以后编程十分有用
 
-## d6 - 绘制矩形平面
+## d6 - 基本三角形、三角带、三角扇绘制矩形、圆形、环形
 
 **请谨记，组成三角形的顶点要按照一定的顺序绘制。默认情况下，WebGL 会认为顶点顺序为逆时针时代表正面，反之则是背面，区分正面、背面的目的在于，如果开启了背面剔除功能的话，背面是不会被绘制的。当我们绘制 3D 形体的时候，这个设置很重要。**
 
+```js
+// 开启多边形剔除（多边形剔除功能默认不开启）
+gl.enable(gl.CULL_FACE);
+// 剔除正面
+gl.cullFace(gl.FRONT); // 可选值：gl.FRONT gl.BACK gl.FRONT_AND_BACK， 默认值：gl.BACK
+```
+
+### WebGLRenderingContext.drawElements()
+
+从数组数据渲染图元。
+
+语法：`void gl.drawElements(mode, count, type, offset);`
+
+- mode: 枚举类型 指定要渲染的图元类型。可以是以下类型:
+  - gl.POINTS: 画单独的点。
+  - gl.LINE_STRIP: 画一条直线到下一个顶点。
+  - gl.LINE_LOOP: 绘制一条直线到下一个顶点，并将最后一个顶点返回到第一个顶点.
+  - gl.LINES: 在一对顶点之间画一条线.
+  - [gl.TRIANGLE_STRIP](https://en.wikipedia.org/wiki/Triangle_strip)
+  - [gl.TRIANGLE_FAN](https://en.wikipedia.org/wiki/Triangle_fan)
+  - gl.TRIANGLES: 为一组三个顶点绘制一个三角形
+- count: 整数型 指定要渲染的元素数量.
+- type: 枚举类型 指定元素数组缓冲区中的值的类型。可能的值是:
+  - gl.UNSIGNED_BYTE
+  - gl.UNSIGNED_SHORT
+  - 当使用[OES_element_index_uint](https://developer.mozilla.org/en-US/docs/Web/API/OES_element_index_uint)扩展时:
+    - gl.UNSIGNED_INT
+- offset: 字节单位 指定元素数组缓冲区中的偏移量。必须是给定类型大小的有效倍数
