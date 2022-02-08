@@ -16,7 +16,7 @@ const a_Color = gl.getAttribLocation(program, 'a_Color');
 gl.enableVertexAttribArray(a_Position);
 gl.enableVertexAttribArray(a_Color);
 
-// 绘制顶点固定的圆形
+// 绘制圆环
 
 // 生成园顶点的函数
 // x：圆心的 x 坐标
@@ -86,6 +86,5 @@ gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertex.positions), gl.STATIC_DRA
 const indicesBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertex.indices), gl.STATIC_DRAW);
-
 
 gl.drawElements(gl.TRIANGLES, vertex.indices.length, gl.UNSIGNED_SHORT, 0);
