@@ -184,6 +184,8 @@ void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
 
 ## d6 - 基本三角形、三角带、三角扇绘制矩形、圆形、环形
 
+> 示例代码：[src/d6](./src/d6/index.html)
+
 **请谨记，组成三角形的顶点要按照一定的顺序绘制。默认情况下，WebGL 会认为顶点顺序为逆时针时代表正面，反之则是背面，区分正面、背面的目的在于，如果开启了背面剔除功能的话，背面是不会被绘制的。当我们绘制 3D 形体的时候，这个设置很重要。**
 
 ```js
@@ -214,3 +216,94 @@ gl.cullFace(gl.FRONT); // 可选值：gl.FRONT gl.BACK gl.FRONT_AND_BACK， 默�
   - 当使用[OES_element_index_uint](https://developer.mozilla.org/en-US/docs/Web/API/OES_element_index_uint)扩展时:
     - gl.UNSIGNED_INT
 - offset: 字节单位 指定元素数组缓冲区中的偏移量。必须是给定类型大小的有效倍数
+
+## d7 - 纹理贴图
+
+WebGL 对图片素材是有严格要求的，图片的宽度和高度必须是 2 的 N 次幂，比如 16 x 16，32 x 32，64 x 64 等。实际上，不是这个尺寸的图片也能进行贴图，但是这样会使得贴图过程更复杂，从而影响性能，所以我们在提供图片素材的时候最好参照这个规范。
+
+**纹理坐标系统**: 纹理也有一套自己的坐标系统，为了和顶点坐标加以区分，通常把纹理坐标称为`UV`，`U`代表横轴坐标，`V`代表纵轴坐标。
+
+![纹理坐标学习](./src/assets/d7_01.awebp)
+
+纹理坐标系统可以理解为一个边长为 1 的正方形。
+
+**贴图的注意点**：
+
+- 图片最好满足 2^m x 2^n 的尺寸要求。
+- 图片数据首先加载到内存中，才能够在纹理中使用。
+- 图片资源加载前要先解决跨域问题。
+
+## d1~d7 - 总结
+
+- GLSL：着色器
+  - 数据类型
+    - vec2：2 维向量容器。
+    - vec4：4 维向量容器。
+    - 运算法则：向量与向量、向量与浮点数的运算法则。
+  - 修饰符
+    - attribute：属性修饰符。
+    - uniform：全局变量修饰符。
+    - varying：顶点着色器传递给片元着色器的属性修饰符。
+  - precision：设置精度
+    - highp：高精度。
+    - mediump：中等精度。
+    - lowp：低精度。
+  - 内置变量
+    - gl_Position：顶点坐标。
+    - gl_FragColor：片元颜色。
+    - gl_PointSize：顶点大小。
+  - 屏幕坐标系到设备坐标系的转换。
+    - 屏幕坐标系左上角为原点，X 轴坐标向右为正，Y 轴坐标向下为正。
+    - 坐标范围：
+      - X轴：【0, canvas.width】
+      - Y轴：【0, canvas.height】
+    - 设备坐标系以屏幕中心为原点，X 轴坐标向右为正，Y 轴向上为正。
+    - 坐标范围是
+      - X轴：【-1, 1】。
+      - Y轴：【-1, 1】。
+- WebGL API
+  - shader：着色器对象
+    - gl.createShader：创建着色器。
+    - gl.shaderSource：指定着色器源码。
+    - gl.compileShader：编译着色器。
+  - program：着色器程序
+    - gl.createProgram：创建着色器程序。
+    - gl.attachShader：链接着色器对象。
+    - gl.linkProgram：链接着色器程序。
+    - gl.useProgram：使用着色器程序。
+  - attribute：着色器属性
+    - gl.getAttribLocation：获取顶点着色器中的属性位置。
+    - gl.enableVertexAttribArray：启用着色器属性。
+    - gl.vertexAttribPointer：设置着色器属性读取 buffer 的方式。
+    - gl.vertexAttrib2f：给着色器属性赋值，值为两个浮点数。
+    - gl.vertexAttrib3f：给着色器属性赋值，值为三个浮点数。
+  - uniform：着色器全局属性
+    - gl.getUniformLocation：获取全局变量位置。
+    - gl.uniform4f：给全局变量赋值 4 个浮点数。
+    - gl.uniform1i：给全局变量赋值 1 个整数。
+  - buffer：缓冲区
+    - gl.createBuffer：创建缓冲区对象。
+    - gl.bindBuffer：将缓冲区对象设置为当前缓冲。
+    - gl.bufferData：向当前缓冲对象复制数据。
+  - clear：清屏
+    - gl.clearColor：设置清除屏幕的背景色。
+    - gl.clear：清除屏幕。
+  - draw：绘制
+    - gl.drawArrays：数组绘制方式。
+    - gl.drawElements：索引绘制方式。
+  - 图元
+    - gl.POINTS：点。
+    - gl.LINE：基本线段。
+    - gl.LINE_STRIP：连续线段。
+    - gl.LINE_LOOP：闭合线段。
+    - gl.TRIANGLES：基本三角形。
+    - gl.TRIANGLE_STRIP：三角带。
+    - gl.TRIANGLE_FAN：三角扇。
+  - 纹理
+    - gl.createTexture：创建纹理对象。
+    - gl.activeTexture：激活纹理单元。
+    - gl.bindTexture：绑定纹理对象到当前纹理。
+    - gl.texImage2D：将图片数据传递给 GPU。
+    - gl.texParameterf：设置图片放大缩小时的过滤算法。
+
+## d8 - 立方体、球体、椎体
