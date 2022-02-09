@@ -1,7 +1,7 @@
 import { init } from '../lib/common.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
 
-const { gl, program, canvas } = init(shaderVertex, shaderFragment);
+const { gl, program, canvas } = init(shaderVertex, shaderFragment, 'canvas3');
 
 // 获取变量 a_Screen_Size
 const a_Screen_Size = gl.getAttribLocation(program, 'a_Screen_Size');

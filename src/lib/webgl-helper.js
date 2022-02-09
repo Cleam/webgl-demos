@@ -1,33 +1,27 @@
+var random = Math.random;
+export function randomColor() {
+  return {
+    r: random() * 255,
+    g: random() * 255,
+    b: random() * 255,
+    a: random() * 1,
+  };
+}
+
+export function $$(str) {
+  if (!str) return null;
+  if (str.startsWith('#')) {
+    return document.querySelector(str);
+  }
+  let result = document.querySelectorAll(str);
+  if (result.length == 1) {
+    return result[0];
+  }
+  return result;
+}
+
 export function getCanvas(id) {
-  return document.querySelector(id);
-}
-
-export function getWebGLContext(canvas) {
-  return canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-}
-
-export function createShader(gl, shaderType, shaderSource) {
-  // 创建(顶点/片元)着色器对象
-  const shader = gl.createShader(shaderType);
-  // 将源码分配给(顶点/片元)着色器对象
-  gl.shaderSource(shader, shaderSource);
-  // 编译(顶点/片元)着色器程序
-  gl.compileShader(shader);
-  return shader;
-}
-
-export function createProgram(gl, ...shaders) {
-  // 创建着色器程序
-  const program = gl.createProgram();
-  // 将顶点着色器、片元着色器挂载到着色器程序上
-  // gl.attachShader(program, vertexShader);
-  // gl.attachShader(program, fragmentShader);
-  shaders.forEach((shader) => {
-    gl.attachShader(program, shader);
-  });
-  // 链接着色器程序
-  gl.linkProgram(program);
-  return program;
+  return $$(id);
 }
 
 export function resizeCanvas(canvas, width, height) {
@@ -39,32 +33,123 @@ export function resizeCanvas(canvas, width, height) {
   }
 }
 
-export function randomColor() {
-  return {
-    r: Math.floor(Math.random() * 255),
-    g: Math.floor(Math.random() * 255),
-    b: Math.floor(Math.random() * 255),
-    a: 1, // Number(Math.random().toFixed(1)),
-  };
+export function getContext(canvas) {
+  return canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+}
+export function getTouchEvent() {
+  var supportTouchEvent = 'ontouchstart' in window;
+  var dragStartEvent = supportTouchEvent ? 'touchstart' : 'mousedown';
+  var dragMoveEvent = supportTouchEvent ? 'touchmove' : 'mousemove';
+  var dragEndEvent = supportTouchEvent ? 'touchend' : 'mouseup';
 }
 
-export function createBuffer(
-  gl,
-  attribute,
-  size,
-  type = gl.FLOAT,
-  normalized = false,
-  stride = 0,
-  offset = 0
-) {
-  // 我们需要告诉 WebGL 如何从之前创建的缓冲区中获取数据，并且传递给顶点着色器中的属性。
-  // 那么，首先启用对应属性：
+export function createShader(gl, type, source) {
+  // 创建(顶点/片元)着色器对象
+  let shader = gl.createShader(type);
+  // 将源码分配给(顶点/片元)着色器对象
+  gl.shaderSource(shader, source);
+  // 编译(顶点/片元)着色器程序
+  gl.compileShader(shader);
+  //检测是否编译正常。
+  let success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  if (success) {
+    return shader;
+  }
+  console.error(gl.getShaderInfoLog(shader));
+  gl.deleteShader(shader);
+}
+/**
+ *
+ *
+ * @param {*} gl，webgl绘图环境
+ * @param {*} type，着色器类型
+ * @param {*} str，着色器源码
+ * @returns 返回着色器对象
+ */
+export function createShaderFromString(gl, type, str) {
+  return createShader(gl, type, str);
+}
+export function createShaderFromScript(gl, type, scriptId) {
+  let sourceScript = $$('#' + scriptId);
+  if (!sourceScript) {
+    return null;
+  }
+  return createShader(gl, type, sourceScript.innerHTML);
+}
+export function createProgramFromString(gl, vertexString, fragmentString) {
+  //创建顶点着色器
+  let vertexShader = createShaderFromString(gl, gl.VERTEX_SHADER, vertexString);
+  //创建片元着色器
+  let fragmentShader = createShaderFromString(gl, gl.FRAGMENT_SHADER, fragmentString);
+
+  //创建着色器程序
+  let program = createProgram(gl, vertexShader, fragmentShader);
+  return program;
+}
+export function createProgram(gl, vertexShader, fragmentShader) {
+  // 创建着色器程序
+  let program = gl.createProgram();
+  // 将顶点着色器、片元着色器挂载到着色器程序上
+  vertexShader && gl.attachShader(program, vertexShader);
+  fragmentShader && gl.attachShader(program, fragmentShader);
+  // 链接着色器程序
+  gl.linkProgram(program);
+  let result = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (result) {
+    console.log('着色器程序创建成功');
+    let uniformSetters = createUniformSetters(gl, program);
+    let attributeSetters = createAttributeSetters(gl, program);
+    return {
+      program: program,
+      uniformSetters: uniformSetters,
+      attributeSetters: attributeSetters,
+    };
+  }
+  let errorLog = gl.getProgramInfoLog(program);
+  gl.deleteProgram(program);
+  throw errorLog;
+}
+export function createSimpleProgram(gl, vertexShader, fragmentShader) {
+  if (!vertexShader || !fragmentShader) {
+    console.warn('着色器不能为空');
+    return;
+  }
+  let program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  let success = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (success) {
+    return program;
+  }
+  console.error(gl.getProgramInfoLog(program));
+  gl.deleteProgram(program);
+}
+export function createSimpleProgramFromScript(gl, vertexScriptId, fragmentScriptId) {
+  let vertexShader = createShaderFromScript(gl, gl.VERTEX_SHADER, vertexScriptId);
+  let fragmentShader = createShaderFromScript(gl, gl.FRAGMENT_SHADER, fragmentScriptId);
+  let program = createSimpleProgram(gl, vertexShader, fragmentShader);
+  return program;
+}
+export function createProgramFromScript(gl, vertexScriptId, fragmentScriptId) {
+  let vertexShader = createShaderFromScript(gl, gl.VERTEX_SHADER, vertexScriptId);
+  let fragmentShader = createShaderFromScript(gl, gl.FRAGMENT_SHADER, fragmentScriptId);
+  let program = createProgram(gl, vertexShader, fragmentShader);
+  return program;
+}
+export function createBuffer(gl, attribute, vertexAttribPointer) {
+  let { size, type, normalize, stride, offset } = vertexAttribPointer;
   gl.enableVertexAttribArray(attribute);
-  const buffer = gl.createBuffer();
-  // 将当前 buffer 设置为 buffer ，接下来对 buffer 的操作都是针对 buffer 了。
-  // gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  // 设置 attribute 变量读取 buffer 缓冲区的方式。
-  gl.vertexAttribPointer(attribute, size, type, normalized, stride, offset);
+  let buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.vertexAttribPointer(
+    attribute,
+    size,
+    type || gl.FLOAT,
+    normalize || false,
+    stride || 0,
+    offset || 0
+  );
   return buffer;
 }
 
@@ -108,3 +193,369 @@ export function createColorForVertex(vertex, c) {
   vertex.colors = new Uint8Array(colors);
   return vertex;
 }
+
+export function createAttributeSetter(gl, attributeIndex) {
+  return function (bufferInfo) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferInfo.buffer);
+    gl.enableVertexAttribArray(attributeIndex);
+    gl.vertexAttribPointer(
+      attributeIndex,
+      bufferInfo.numsPerElement || bufferInfo.size,
+      bufferInfo.type || gl.FLOAT,
+      bufferInfo.normalize || false,
+      bufferInfo.stride || 0,
+      bufferInfo.offset || 0
+    );
+  };
+}
+
+export function getVariableCounts(gl, program, type) {
+  return gl.getProgramParameter(program, type);
+}
+
+export function createAttributeSetters(gl, program) {
+  let attributesCount = getVariableCounts(gl, program, gl.ACTIVE_ATTRIBUTES);
+  let attributeSetter = {};
+  for (let i = 0; i < attributesCount; i++) {
+    let attributeInfo = gl.getActiveAttrib(program, i);
+    console.log('attributeInfo :>> ', attributeInfo);
+    let attributeIndex = gl.getAttribLocation(program, attributeInfo.name);
+    attributeSetter[attributeInfo.name] = createAttributeSetter(gl, attributeIndex);
+  }
+  return attributeSetter;
+}
+
+export function createUniformSetters(gl, program) {
+  let uniformSetters = {};
+  let uniformsCount = getVariableCounts(gl, program, gl.ACTIVE_UNIFORMS);
+  for (let i = 0; i < uniformsCount; i++) {
+    let uniformInfo = gl.getActiveUniform(program, i);
+    if (!uniformInfo) {
+      break;
+    }
+    let name = uniformInfo.name;
+    if (name.substr(-3) === '[0]') {
+      name = name.substr(0, name.length - 3);
+    }
+    let setter = createUniformSetter(gl, program, uniformInfo);
+    uniformSetters[name] = setter;
+  }
+  return uniformSetters;
+}
+
+let enums = {
+  FLOAT_VEC2: {
+    value: 0x8b50,
+    setter: function (location, v) {
+      gl.uniform2fv(location, v);
+    },
+  },
+  FLOAT_VEC3: {
+    value: 0x8b51,
+    setter: function (location, v) {
+      console.log(v);
+      gl.uniform3fv(location, v);
+    },
+  },
+  FLOAT_VEC4: {
+    value: 0x8b52,
+    setter: function (location, v) {
+      gl.uniform3fv(location, v);
+    },
+  },
+  INT_VEC2: {
+    value: 0x8b53,
+    setter: function (location, v) {
+      gl.uniform2iv(location, v);
+    },
+  },
+  INT_VEC3: {
+    value: 0x8b54,
+    setter: function (location, v) {
+      gl.uniform3iv(location, v);
+    },
+  },
+  INT_VEC4: {
+    value: 0x8b55,
+    setter: function (location, v) {
+      gl.uniform4iv(location, v);
+    },
+  },
+  BOOL: {
+    value: 0x8b56,
+    setter: function (location, v) {
+      gl.uniform1iv(location, v);
+    },
+  },
+  BOOL_VEC2: {
+    value: 0x8b57,
+    setter: function (location, v) {
+      gl.uniform2iv(location, v);
+    },
+  },
+  BOOL_VEC3: {
+    value: 0x8b58,
+    setter: function (location, v) {
+      gl.uniform3iv(location, v);
+    },
+  },
+  BOOL_VEC4: {
+    value: 0x8b59,
+    setter: function (location, v) {
+      gl.uniform4iv(location, v);
+    },
+  },
+  FLOAT_MAT2: {
+    value: 0x8b5a,
+    setter: function (location, v) {
+      gl.uniformMatrix2fv(location, false, v);
+    },
+  },
+  FLOAT_MAT3: {
+    value: 0x8b5b,
+    setter: function (location, v) {
+      gl.uniformMatrix3fv(location, false, v);
+    },
+  },
+  FLOAT_MAT4: {
+    value: 0x8b5c,
+    setter: function (location, v) {
+      gl.uniformMatrix4fv(location, false, v);
+    },
+  },
+  SAMPLER_2D: {
+    value: 0x8b5e,
+    setter: function (location, texture) {
+      gl.uniform1i(location, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+    },
+  },
+  SAMPLER_CUBE: {
+    value: 0x8b60,
+    setter: function (location, texture) {
+      gl.uniform1i(location, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+    },
+  },
+
+  INT: {
+    value: 0x1404,
+    setter: function (location, v) {
+      gl.uniform1i(location, v);
+    },
+  },
+
+  FLOAT: {
+    value: 0x1406,
+    setter: function (location, v) {
+      gl.uniform1f(location, v);
+    },
+  },
+};
+export function getKeyFromType(type) {
+  for (let i in enums) {
+    if (enums[i].value == type) {
+      return i;
+    }
+  }
+}
+export function createUniformSetter(gl, program, uniformInfo) {
+  let uniformLocation = gl.getUniformLocation(program, uniformInfo.name);
+  let type = uniformInfo.type;
+  let isArray = uniformInfo.size > 1 && uniformInfo.name.substr(-3) === '[0]';
+
+  if (isArray && type == enums.INT.value) {
+    return function (v) {
+      gl.uniform1iv(uniformLocation, v);
+    };
+  }
+  if (isArray && type == enums.FLOAT.value) {
+    return function (v) {
+      gl.uniform1fv(uniformLocation, v);
+    };
+  }
+  return function createSetter(v) {
+    return enums[getKeyFromType(type)].setter(uniformLocation, v);
+  };
+}
+
+export function buffer2Attribute(object) {
+  let map = {};
+  Object.keys(object).forEach(function (name) {
+    if (name == 'indices') {
+      return;
+    }
+    map['a_' + name[0].toUpperCase() + name.substr(1, name.length - 2)] = name;
+  });
+  return map;
+}
+export function getNumsPerElementByName(name) {
+  switch (name) {
+    case 'colors':
+      return 4;
+    case 'positions':
+      return 3;
+    case 'normals':
+      return 3;
+    case 'texcoords':
+      return 2;
+    default:
+      return 4;
+  }
+}
+export function getTypeByName(name) {
+  if (name == 'colors') {
+    return Uint8Array;
+  }
+  if (name == 'positions' || name == 'normals' || name == 'texcoords') {
+    return Float32Array;
+  }
+  if (name == 'indices') {
+    return Uint16Array;
+  }
+  return Float32Array;
+}
+export function makeTypedArray(data, name) {
+  if (!data.numsPerElement) {
+    data.numsPerElement = getNumsPerElementByName(name, data.length);
+  }
+
+  let type = getTypeByName(name);
+  let typedArray = data;
+  if (Array.isArray(data)) {
+    typedArray = new type(data);
+  }
+
+  typedArray.numsPerElement = data.numsPerElement;
+  Object.defineProperty(typedArray, 'elementsCount', {
+    get: function () {
+      return this.length / this.numsPerElement;
+    },
+  });
+  return typedArray;
+}
+export function createWebGLBuffer(gl, typedArray, bufferType, drawType) {
+  let buffer = gl.createBuffer();
+  bufferType = bufferType || gl.ARRAY_BUFFER;
+  gl.bindBuffer(bufferType, buffer);
+  gl.bufferData(bufferType, typedArray, drawType || gl.STATIC_DRAW);
+  return buffer;
+}
+export function getWebGLTypeByTypedArrayType(gl, array) {
+  switch (array.constructor) {
+    case Int8Array:
+      return gl.BYTE;
+    case Uint8Array:
+      return gl.UNSIGNED_BYTE;
+    case Int16Array:
+      return gl.SHORT;
+    case Uint16Array:
+      return gl.UNSIGNED_SHORT;
+    case Int32Array:
+      return gl.INT;
+    case Uint32Array:
+      return gl.UNSIGNED_INT;
+    case Float32Array:
+      return gl.FLOAT;
+  }
+}
+export function getNormalize(array) {
+  if (array instanceof Uint8Array || array instanceof Int8Array) {
+    return true;
+  }
+  return false;
+}
+export function makeAttributesInBufferInfo(gl, object) {
+  let mapping = buffer2Attribute(object);
+  let attributeObject = {};
+  Object.keys(mapping).forEach(function (attributeName) {
+    let bufferName = mapping[attributeName];
+    let array = makeTypedArray(object[bufferName], bufferName);
+    attributeObject[attributeName] = {
+      buffer: createWebGLBuffer(gl, array),
+      numsPerElement: array.numsPerElement || getNumsPerElementByName(bufferName),
+      type: getWebGLTypeByTypedArrayType(gl, array),
+      normalize: getNormalize(array),
+    };
+  });
+  return attributeObject;
+}
+export function createBufferInfoFromObject(gl, object) {
+  let bufferInfo = {};
+  bufferInfo.attributes = makeAttributesInBufferInfo(gl, object);
+  let indices = object.indices;
+  if (indices) {
+    indices = makeTypedArray(indices, 'indices');
+    bufferInfo.indices = createWebGLBuffer(gl, indices, gl.ELEMENT_ARRAY_BUFFER);
+    bufferInfo.elementsCount = indices.length;
+  } else {
+    bufferInfo.elementsCount = setElementsCountPerAttribute(object);
+  }
+
+  return bufferInfo;
+}
+
+export function setElementsCountPerAttribute(object) {
+  let key = Object.keys(object)[0];
+  let array = object[key];
+  if (array && array.buffer instanceof ArrayBuffer) {
+    return array.elementsCount;
+  } else {
+    return array.length / array.numsPerElement;
+  }
+}
+export function setBufferInfos(gl, setters, buffers) {
+  if (!buffers.attributes) {
+    return;
+  }
+  setAttributes(setters, buffers.attributes);
+  if (buffers.indices) {
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+  }
+}
+
+export function setAttributes(setters, attributes) {
+  setters = setters.attributeSetters || setters;
+  Object.keys(attributes).forEach(function (name) {
+    let setter = setters[name];
+    if (setter) {
+      setter(attributes[name]);
+    }
+  });
+}
+
+export function setUniforms(setters, values) {
+  setters = setters.uniformSetters || setters;
+  Object.keys(values).forEach(function (name) {
+    let setter = setters[name];
+    if (setter) {
+      setter(values[name]);
+    }
+  });
+}
+
+// 列表类
+export function List(list) {
+  this.list = list || [];
+  this.uuid = this.list.length;
+}
+// 添加对象
+List.prototype.add = function (object) {
+  object.uuid = this.uuid;
+  this.list.push(object);
+  this.uuid++;
+};
+// 删除对象
+List.prototype.remove = function (object) {
+  this.list.splice(object.uuid, 1);
+};
+// 删除对象
+List.prototype.get = function (index) {
+  return this.list[index];
+};
+// 添加对象
+List.prototype.forEach = function (fun) {
+  this.list.forEach(fun);
+};

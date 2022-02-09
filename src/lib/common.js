@@ -1,22 +1,23 @@
 import {
   getCanvas,
-  getWebGLContext,
+  getContext,
   createShader,
   createProgram,
   resizeCanvas,
 } from './webgl-helper.js';
 
-export const init = (shaderVertex, shaderFragment) => {
-  const canvas = getCanvas('#canvas');
+export const init = (shaderVertex, shaderFragment, canvasId = 'canvas') => {
+  const canvas = getCanvas('#' + canvasId);
+  // console.log('canvas :>> ', canvas);
   resizeCanvas(canvas);
   window.addEventListener('resize', () => {
     resizeCanvas(canvas);
   });
-  const gl = getWebGLContext(canvas);
+  const gl = getContext(canvas);
 
   const vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderVertex);
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderFragment);
-  const program = createProgram(gl, vertexShader, fragmentShader);
+  const { program } = createProgram(gl, vertexShader, fragmentShader);
 
   // 有时候一个 WebGL 应用包含多个 program，
   // 所以在使用某个 program 绘制之前，我们要先启用它。

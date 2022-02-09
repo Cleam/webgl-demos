@@ -339,3 +339,30 @@ gl_Position 接收到裁剪坐标之后，顶点着色器会对坐标进行透�
 > 请谨记：每个转换可以用一个矩阵来表示，转换矩阵相乘，得出的最终矩阵用来表示组合变换。
 
 旋转动画实现：每隔 50 ms 分别绕 X 轴和 Y 轴转动 1 度，然后将旋转对应的矩阵传给顶点着色器。
+
+## d9 - 绘制多个物体（进一步封装绘制方法）
+
+> 示例代码：[src/d8](./src/d8/index.html) - TODO...
+
+WebGL 的开发步骤（WebGL 的基本绘制流程，只是在绘制单个模型时的步骤）：
+
+- 初始化阶段
+  - 创建所有着色器程序。
+  - 寻找全部 attribute 参数位置。
+  - 寻找全部 uniforms 参数位置。
+  - 创建缓冲区，并向缓冲区上传顶点数据。
+  - 创建纹理，并上传纹理数据。
+- 首次渲染阶段
+  - 为 uniforms 变量赋值。
+  - 处理 attribute 变量
+    - 使用 gl.bindBuffer 重新绑定模型的 attribute 变量。
+    - 使用 gl.enableVertexAttribArray 启用 attribute 变量。
+    - 使用 gl.vertexAttribPointer设置 attribute变量从缓冲区中读取数据的方式。
+    - 使用 gl.bufferData 将数据传送到缓冲区中。
+  - 使用 gl.drawArrays 执行绘制。
+- 后续渲染阶段
+  - 对发生变化的 uniforms 变量重新赋值。
+  - 每个模型的 attribute 变量。
+    - 使用 gl.bindBuffer 重新绑定模型的 attribute 变量。
+    - 使用 gl.bufferData 重新向缓冲区上传模型的 attribute 数据。
+  - 使用 gl.drawArrays 执行绘制。

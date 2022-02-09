@@ -19,18 +19,22 @@
       width: 100%;
       height: 100%;
     }
-  </style>
-  <!-- <script type="importmap">
-    {
-      "imports": {
-        "lodash" "/node_modules/lodash-es/lodash.js"
-        "lodash/" "/node_modules/lodash-es"
-      }
+
+    .info {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      text-align: center;
+      color: coral;
+      touch-action: none;
     }
-  </script> -->
+  </style>
 </head>
 
 <body>
+  <h3 class="info">点击并滑动鼠标试试</h3>
   <canvas id="canvas"></canvas>
 
   <script type="module" src="index.js"></script>

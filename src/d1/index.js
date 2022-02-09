@@ -1,15 +1,7 @@
 import { shaderVertex, shaderFragment } from './index.glsl.js';
-import { createShader, createProgram } from '../lib/webgl-helper.js';
+import { init } from '../lib/common.js';
 
-const { gl, program } = init(shaderVertex, shaderFragment);
-
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderVertex);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderFragment);
-const program = createProgram(gl, vertexShader, fragmentShader);
-
-// 有时候一个 WebGL 应用包含多个 program，
-// 所以在使用某个 program 绘制之前，我们要先启用它。
-gl.useProgram(program);
+const { gl } = init(shaderVertex, shaderFragment);
 
 // 开始绘制
 // 设置清空画布颜色为黑色

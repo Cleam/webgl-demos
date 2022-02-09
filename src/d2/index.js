@@ -1,15 +1,16 @@
 import { shaderVertex, shaderFragment } from './index.glsl.js';
+import { init } from '../lib/common.js';
 import { createShader, createProgram, randomColor } from '../lib/webgl-helper.js';
 
 const { gl, program, canvas } = init(shaderVertex, shaderFragment);
 
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderVertex);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderFragment);
-const program = createProgram(gl, vertexShader, fragmentShader);
+// const vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderVertex);
+// const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderFragment);
+// const program = createProgram(gl, vertexShader, fragmentShader);
 
-// 有时候一个 WebGL 应用包含多个 program，
-// 所以在使用某个 program 绘制之前，我们要先启用它。
-gl.useProgram(program);
+// // 有时候一个 WebGL 应用包含多个 program，
+// // 所以在使用某个 program 绘制之前，我们要先启用它。
+// gl.useProgram(program);
 
 // 开始绘制
 // 设置清空画布颜色为黑色
