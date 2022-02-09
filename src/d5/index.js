@@ -1,5 +1,5 @@
-import { init } from '../common.js';
-import { createBuffer, randomColor } from '../webgl-helper.js';
+import { init } from '../lib/common.js';
+import { createBuffer, randomColor } from '../lib/webgl-helper.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
 import { throttle } from '/node_modules/lodash-es/lodash.js';
 

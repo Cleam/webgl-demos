@@ -1,4 +1,4 @@
-import { init } from '../common.js';
+import { init } from '../lib/common.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
 
 const { gl, program, canvas } = init(shaderVertex, shaderFragment);

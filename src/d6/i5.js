@@ -1,5 +1,5 @@
-import { init } from '../common.js';
-import { randomColor } from '../webgl-helper.js';
+import { init } from '../lib/common.js';
+import { randomColor } from '../lib/webgl-helper.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
 
 const { gl, program, canvas } = init(shaderVertex, shaderFragment);

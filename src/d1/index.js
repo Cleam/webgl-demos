@@ -1,5 +1,5 @@
 import { shaderVertex, shaderFragment } from './index.glsl.js';
-import { createShader, createProgram } from '../webgl-helper.js';
+import { createShader, createProgram } from '../lib/webgl-helper.js';
 
 const { gl, program } = init(shaderVertex, shaderFragment);
 
