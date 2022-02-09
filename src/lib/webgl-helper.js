@@ -62,7 +62,7 @@ export function createBuffer(
   gl.enableVertexAttribArray(attribute);
   const buffer = gl.createBuffer();
   // 将当前 buffer 设置为 buffer ，接下来对 buffer 的操作都是针对 buffer 了。
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   // 设置 attribute 变量读取 buffer 缓冲区的方式。
   gl.vertexAttribPointer(attribute, size, type, normalized, stride, offset);
   return buffer;
