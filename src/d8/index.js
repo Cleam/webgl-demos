@@ -1,7 +1,16 @@
 import { init } from '../lib/common.js';
 import { shaderVertex, shaderFragment } from './index.glsl.js';
 import matrix from '../lib/webgl-matrix.js';
-import lib3d from '../lib/lib3d.js';
+import { Vector3 } from '../lib/lib3d.js';
+import {
+  createSphere,
+  createCone,
+  transformIndicesToUnIndices,
+  createCube,
+  createLongCube,
+  createWing,
+} from '../lib/geometry.js';
+import { createColorForVertex } from '../lib/webgl-helper.js';
 
 const { gl, program } = init(shaderVertex, shaderFragment);
 
@@ -29,114 +38,107 @@ const u_Matrix = gl.getUniformLocation(program, 'u_Matrix');
 // 在之前章节的例子中，我们给出的顶点坐标都是基于屏幕坐标系，然后在顶点着色器中对顶点作简单转换处理，转变成 NDC 坐标。
 // 本节会忽略裁剪坐标系之前的一些坐标变换，在 JavaScript 中直接采用裁剪坐标系坐标来表示顶点位置。
 
-// 正方体顶点的坐标信息（6个面）
-// prettier-ignore
-const positions = [
-  -0.5, -0.5, 0.5, 1, 0, 0, 1,
-  0.5, -0.5, 0.5, 1, 0, 0, 1,
-  0.5, 0.5, 0.5, 1, 0, 0, 1,
-  -0.5, 0.5, 0.5, 1, 0, 0, 1,
-  
-  -0.5, 0.5, 0.5, 0, 1, 0, 1,
-  -0.5, 0.5, -0.5, 0, 1, 0, 1,
-  -0.5, -0.5, -0.5, 0, 1, 0, 1,
-  -0.5, -0.5, 0.5, 0, 1, 0, 1,
+// 立方体
+// let vertex = createCube(10, 6, 6);
+// 多个立方体拼接
+// let vertex = createLongCube(10, 6, 6, 2);
+// 球体
+// let vertex = createSphere(5, 12, 12);
+// 椎体
+// let vertex = createCone(0, 6, 12, 10, 8);
+// let vertex = createCone(2, 6, 12, 10, 8);
+let vertex = createCone(4, 4, 12, 10, 8);
+// 梯形体
+// let vertex = createWing(2, 6, 8, 6);
 
-  0.5, 0.5, 0.5, 0, 0, 1, 1,
-  0.5, -0.5, 0.5, 0, 0, 1, 1,
-  0.5, -0.5, -0.5, 0, 0, 1, 1,
-  0.5, 0.5, -0.5, 0, 0, 1, 1,
+vertex = transformIndicesToUnIndices(vertex);
+createColorForVertex(vertex);
 
-  0.5, 0.5, -0.5, 1, 0, 1, 1,
-  0.5, -0.5, -0.5, 1, 0, 1, 1,
-  -0.5, -0.5, -0.5, 1, 0, 1, 1,
-  -0.5, 0.5, -0.5, 1, 0, 1, 1,
+console.log('vertex :>> ', vertex);
 
-  -0.5, 0.5, 0.5, 1, 1, 0, 1,
-  0.5, 0.5, 0.5, 1, 1, 0, 1,
-  0.5, 0.5, -0.5, 1, 1, 0, 1,
-  -0.5, 0.5, -0.5, 1, 1, 0, 1,
+const positions = vertex.positions;
+const colors = vertex.colors;
 
-  -0.5, -0.5, 0.5, 0, 1, 1, 1,
-  -0.5, -0.5, -0.5, 0, 1, 1, 1,
-  0.5, -0.5, -0.5, 0, 1, 1, 1,
-  0.5, -0.5, 0.5, 0, 1, 1, 1,
-];
+const aspect = canvas.clientWidth / canvas.clientHeight;
+const fieldOfViewRadians = 60;
+const projectionMatrix = matrix.perspective(fieldOfViewRadians, aspect, 1, 2000);
+const cameraPosition = new Vector3(0, 0, 30);
+const target = new Vector3(0, 0, 0);
+const up = new Vector3(0, 1, 0);
+const cameraMatrix = matrix.lookAt(cameraPosition, target, up);
+const viewMatrix = matrix.inverse(cameraMatrix);
+const viewProjectionMatrix = matrix.multiply(projectionMatrix, viewMatrix);
 
-// 创建buffer缓冲区
-const positionsBuffer = gl.createBuffer();
-// 将缓冲区绑定到目标
-gl.bindBuffer(gl.ARRAY_BUFFER, positionsBuffer);
-// 定义buffer数据读取方式（该代码必须在bindBuffer之后，否则报错“WebGL: no ARRAY_BUFFER is bound and offset is non-zero”）
-gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 7 * Float32Array.BYTES_PER_ELEMENT, 0);
-gl.vertexAttribPointer(
-  a_Color,
-  4,
-  gl.FLOAT,
-  false,
-  7 * Float32Array.BYTES_PER_ELEMENT,
-  3 * Float32Array.BYTES_PER_ELEMENT
-);
-// 向缓冲区写入数据
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+gl.uniformMatrix4fv(u_Matrix, false, viewProjectionMatrix);
 
-// 定义顶点索引（6个面 * 4个顶点 = 24）
-// prettier-ignore
-const indices = [
-  0, 1, 2, 0, 
-  2, 3, 4, 5, 
-  6, 4, 6, 7, 
-  8, 9, 10, 8, 
-  10, 11, 12, 13, 
-  14, 12, 14, 15, 
-  16, 17, 18, 16,
-  18, 19, 20, 21, 
-  22, 20, 22, 23
-];
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
 
-const indicesBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
-gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+const colorBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+gl.vertexAttribPointer(a_Color, 4, gl.UNSIGNED_BYTE, true, 0, 0);
 
-//设置清屏颜色为黑色。
-gl.clearColor(0, 0, 0, 1);
-//隐藏背面
-gl.enable(gl.CULL_FACE);
+// const indicesBuffer = gl.createBuffer();
+// gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+// gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-const aspect = canvas.width / canvas.height;
-// 计算正交投影矩阵
-const projectionMatrix = matrix.ortho(-aspect * 4, aspect * 4, -4, 4, 100, -100);
-const deg2radians = lib3d.math.deg2radians;
-
-gl.clear(gl.COLOR_BUFFER_BIT);
-
-/*渲染*/
-function render() {
-  xAngle += 1;
-  yAngle += 1;
-  // 先绕 Y 轴旋转矩阵。
-  matrix.rotationY(deg2radians(yAngle), dstMatrix);
-  // 再绕 X 轴旋转
-  matrix.multiply(dstMatrix, matrix.rotationX(deg2radians(xAngle), tmpMatrix), dstMatrix);
-  // 模型投影矩阵。
-  matrix.multiply(projectionMatrix, dstMatrix, dstMatrix);
-
-  gl.uniformMatrix4fv(u_Matrix, false, dstMatrix);
+function render(gl) {
+  //用上一步设置的清空画布颜色清空画布。
   gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
-  if (!playing) {
+  if (positions.length <= 0) {
     return;
   }
-  requestAnimationFrame(render);
+  //绘制图元设置为三角形。
+  let primitiveType = gl.TRIANGLES;
+  gl.drawArrays(primitiveType, 0, positions.length / 3);
 }
+//设置清屏颜色
+gl.clearColor(0, 0, 0, 1.0);
+gl.enable(gl.DEPTH_TEST);
+gl.enable(gl.CULL_FACE);
 
-var playing = false;
-var xAngle = 0;
-var yAngle = 0;
-var dstMatrix = matrix.identity();
-var tmpMatrix = matrix.identity();
-document.body.addEventListener('click', function () {
-  playing = !playing;
-  render();
+let yAngle = 0;
+let xAngle = 0;
+let timer = null;
+// let playing = false;
+let matrixX = matrix.identity();
+let matrixY = matrix.identity();
+
+document.body.addEventListener('click', () => {
+  // playing = !playing;
+  animate();
 });
-render();
+
+function animate(e) {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  } else {
+    timer = setInterval(() => {
+      yAngle += 1;
+      xAngle += 1;
+      matrixY = matrix.rotationY((Math.PI / 180) * yAngle, matrixY);
+      matrixX = matrix.rotateX(matrixY, (Math.PI / 180) * xAngle, matrixX);
+
+      gl.uniformMatrix4fv(u_Matrix, false, matrix.multiply(viewProjectionMatrix, matrixX));
+      render(gl);
+    }, 20); // 时间太短会导致渲染异常
+  }
+
+  // 使用这种方式，我电脑（mbp 2018款）会出现渲染异常，可能频率太快导致部分三角形渲染不出来。
+  // yAngle += 1;
+  // xAngle += 1;
+  // matrixY = matrix.rotationY((Math.PI / 180) * yAngle, matrixY);
+  // matrixX = matrix.rotateX(matrixY, (Math.PI / 180) * xAngle, matrixX);
+
+  // gl.uniformMatrix4fv(u_Matrix, false, matrix.multiply(viewProjectionMatrix, matrixX));
+  // render(gl);
+  // if (!playing) {
+  //   return;
+  // }
+  // requestAnimationFrame(animate);
+}
+render(gl);

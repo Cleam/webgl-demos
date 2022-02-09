@@ -8,6 +8,7 @@ attribute vec3 a_Position;
 attribute vec4 a_Color;
 // 传往片元着色器的颜色
 varying vec4 v_Color;
+// 定义一个变换矩阵，用来接收 JavaScript 中传过来的模型投影变换矩阵，同时将变换矩阵左乘顶点坐标。
 uniform mat4 u_Matrix;
 void main() {
   gl_Position = u_Matrix * vec4(a_Position, 1);

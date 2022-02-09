@@ -89,3 +89,22 @@ export function loadTexture(gl, src, attribute, callback) {
   };
   img.src = src;
 }
+
+export function createColorForVertex(vertex, c) {
+  let vertexNums = vertex.positions;
+  let colors = [];
+  let color = c || {
+    r: 255,
+    g: 0,
+    b: 0,
+    a: 255,
+  };
+
+  for (let i = 0; i < vertexNums.length; i++) {
+    color = c || randomColor();
+    colors.push(color.r, color.g, color.b, 255);
+  }
+
+  vertex.colors = new Uint8Array(colors);
+  return vertex;
+}

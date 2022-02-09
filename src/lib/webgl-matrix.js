@@ -1,3 +1,5 @@
+import { Vector3 } from './lib3d.js';
+
 /**
  *单位矩阵
  *
@@ -316,7 +318,7 @@ export function rotationZ(angle, target) {
 }
 
 export function rotateX(m, angle, target) {
-  target = traget || new Float32Array(16);
+  target = target || new Float32Array(16);
 
   var m10 = m[4];
   var m11 = m[5];
