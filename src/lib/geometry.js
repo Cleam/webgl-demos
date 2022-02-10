@@ -146,7 +146,7 @@ export function createWing(topWidth, bottomWidth, height, depth) {
   colors = new Uint8Array(colors);
   normals = new Float32Array(normals);
   texcoords = new Float32Array(texcoords);
-  console.log('texcooords', texcoords);
+  // console.log('texcooords', texcoords);
   return {
     positions: positions,
     indices: indices,
@@ -219,7 +219,7 @@ export function createCube(width, height, depth) {
   colors = new Uint8Array(colors);
   normals = new Float32Array(normals);
   texcoords = new Float32Array(texcoords);
-  console.log('texcooords', texcoords);
+  // console.log('texcooords', texcoords);
   return {
     positions: positions,
     indices: indices,
@@ -313,7 +313,7 @@ export function createLongCube(width, height, depth, repeatCount) {
   colors = new Uint8Array(colors);
   normals = new Float32Array(normals);
   texcoords = new Float32Array(texcoords);
-  console.log('texcooords', texcoords);
+  // console.log('texcooords', texcoords);
   return {
     positions: positions,
     indices: indices,

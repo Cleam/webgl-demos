@@ -218,7 +218,7 @@ export function createAttributeSetters(gl, program) {
   let attributeSetter = {};
   for (let i = 0; i < attributesCount; i++) {
     let attributeInfo = gl.getActiveAttrib(program, i);
-    console.log('attributeInfo :>> ', attributeInfo);
+    // console.log('attributeInfo :>> ', attributeInfo);
     let attributeIndex = gl.getAttribLocation(program, attributeInfo.name);
     attributeSetter[attributeInfo.name] = createAttributeSetter(gl, attributeIndex);
   }
