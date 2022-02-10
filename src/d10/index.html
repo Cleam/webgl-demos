@@ -21,13 +21,19 @@
       left: 0;
       right: 0;
       width: 100%;
-      text-align: center;
+      /* text-align: center; */
       color: coral;
       touch-action: none;
     }
 
-    .tips {
-      font-size: 12px;
+    .options {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 320px;
+      background-color: cadetblue;
+      color: whitesmoke;
+      padding: 10px;
     }
 
     canvas {
@@ -35,11 +41,34 @@
       width: 33.33%;
       float: left;
     }
+
+    button {
+      border: 1px solid #2869d8;
+      background-color: #2869d8;
+      color: white;
+    }
   </style>
 </head>
 
 <body>
-  <h3 class="info">立方体、球体、椎体<i class="tips">（点击屏幕播放/暂停）</i></h3>
+  <h3 class="info">光照效果</h3>
+  <div class="options">
+    <div>
+      <button id="play">播放</button>
+      <button id="autoColor">自动颜色</button>
+      <button id="autoFactor">自动强度因子</button>
+    </div>
+    <div>
+      光强度因子：
+      <input id="ambientFactor" class="range" type="range" min="0" max="1" step="0.01" value="0.8" />
+      <span id="factor">0.8</span>
+    </div>
+    <div>
+      光线颜色：
+      <input id="lightColor" class="color" type="color" value="#FFFFFF" />
+      <span id="light">r: 255, g: 255, b: 255</span>
+    </div>
+  </div>
   <canvas id="canvas1"></canvas>
   <canvas id="canvas2"></canvas>
   <canvas id="canvas3"></canvas>

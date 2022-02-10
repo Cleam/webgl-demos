@@ -559,3 +559,26 @@ List.prototype.get = function (index) {
 List.prototype.forEach = function (fun) {
   this.list.forEach(fun);
 };
+
+export function getRGBFromColor(color) {
+  color = color.startsWith('#') ? color.substr(1) : color;
+  var hex = color.split('');
+  var r = parseInt(hex[0], 16) * 16 + parseInt(hex[1], 16);
+  var g = parseInt(hex[2], 16) * 16 + parseInt(hex[3], 16);
+  var b = parseInt(hex[4], 16) * 16 + parseInt(hex[5], 16);
+  return {
+    r: r,
+    g: g,
+    b: b,
+  };
+}
+
+export function getHexColorFromRGB(rgb) {
+  let r = Math.abs(rgb.r).toString(16);
+  let g = Math.abs(rgb.g).toString(16);
+  let b = Math.abs(rgb.b).toString(16);
+  if (r.length === 1) r = '0' + r;
+  if (g.length === 1) g = '0' + g;
+  if (b.length === 1) b = '0' + b;
+  return '#' + r + g + b;
+}

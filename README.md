@@ -342,7 +342,7 @@ gl_Position 接收到裁剪坐标之后，顶点着色器会对坐标进行透�
 
 ## d9 - 绘制多个物体（进一步封装绘制方法）
 
-> 示例代码：[src/d8](./src/d8/index.html) - TODO...
+> 示例代码：[src/d9](./src/d9/index.html) - TODO...
 
 WebGL 的开发步骤（WebGL 的基本绘制流程，只是在绘制单个模型时的步骤）：
 
@@ -366,3 +366,33 @@ WebGL 的开发步骤（WebGL 的基本绘制流程，只是在绘制单个模�
     - 使用 gl.bindBuffer 重新绑定模型的 attribute 变量。
     - 使用 gl.bufferData 重新向缓冲区上传模型的 attribute 数据。
   - 使用 gl.drawArrays 执行绘制。
+
+## d10 - 光照、环境光
+
+> 示例代码：[src/d10](./src/d10/index.html)
+
+人眼看到的物体是什么颜色，就代表这个物体反射该颜色。
+
+在计算机领域中，将光源颜色的各个分量与物体颜色的各个分量相乘，得到的就是物体所反射的颜色，即该物体在该光源照射下进入人眼的颜色：
+
+```glsl
+vec3 light = vec3(1, 1, 1);
+vec3 color = vec3(1, 0, 0);
+vec3 resultColor = light * color
+// 在 GLSL 语言中，vec3 与 vec3 相乘的实质是将两个 vec3 的分量分别相乘，得到一个新的 vec3。
+resultColor = (0 * 1, 0 * 0, 1 * 0) = (0, 0, 0)
+```
+
+**环境光**：通常，我们使用一个较小的常量乘以光的颜色来模拟环境光。
+
+```glsl
+// 假设有一个光源，发出的光线是白色光：
+vec3 lightColor = vec3(1, 1, 1);
+// 我们定义环境光的常量因子为 0.1
+float ambientFactor = 0.1;
+// 那么环境光的计算如下：
+vec3 ambientColor = ambientFactor * lightColor;
+// GLSL中浮点数和 vec 向量相乘的实质是将该浮点数分别与vec向量的各个分量相乘，并返回新的 vec向量
+// 计算出的环境光是： 
+ambientColor = (1 * 0.1, 0.1 * 1, 0.1 * 1) = (0.1, 0.1, 0.1)
+```
