@@ -169,6 +169,12 @@ export function translation(tx, ty, tz, target) {
   target[13] = ty || 0;
   target[14] = tz || 0;
   target[15] = 1;
+  /*
+    1 0 0 tx
+    0 1 0 ty
+    0 0 1 tz
+    0 0 0 1
+  */
   return target;
 }
 

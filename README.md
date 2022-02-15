@@ -1110,6 +1110,70 @@ gx + hy + iz + tz \\
 0 + 0 + 0 + 1
 \end{pmatrix}
 $$
+转换后的向量的每一个分量都实现了`ax + by + cz + 常数`的格式，也就是说，向量可以通过乘以一个矩阵实现平移操作。
+
+### 平移矩阵
+
+$$
+\begin{pmatrix}
+1 & 0 & 0 & tx \\
+0 & 1 & 0 & ty \\
+0 & 0 & 1 & tz \\
+0 & 0 & 0 & 1
+\end {pmatrix}
+$$
+
+- tx：沿 X 轴方向平移量。
+- ty：沿 Y 轴方向平移量。
+- tz：沿 Z 轴方向平移量。
+
+### 缩放矩阵
+
+![d18_02](src/assets//d18_02.awebp)
+
+$$
+\begin{pmatrix}
+sx & 0 & 0 & 0 \\
+0 & sy & 0 & 0 \\
+0 & 0 & sz & 0 \\
+0 & 0 & 0 & 1
+\end {pmatrix}
+$$
+
+- sx：沿着 X 轴方向的缩放比例
+- sy：沿着 Y 轴方向的缩放比例
+- sz：沿着 Z 轴方向的缩放比例
+
+### 旋转
+
+**绕X轴旋转**：
+
+![d18_03](src/assets/d18_03.awebp)
+
+**绕Y轴旋转**：
+
+![d18_04](src/assets/d18_04.awebp)
+
+**绕Z轴旋转**：
+
+![d18_05](src/assets/d18_05.awebp)
+
+**绕任意旋转轴的变换矩阵**:
+
+$$
+\begin{pmatrix}
+t_x^2  (1-cos\beta) + cos\beta &
+t_xt_y(1-cos\beta) - t_zsin\beta &
+t_xt_z(1-cos\beta) + t_ysin\beta & 0 \\
+t_xt_y  (1-cos\beta) + t_zsin\beta &
+t_y^2(1-cos\beta) + cos\beta &
+t_yt_z(1-cos\beta) - t_xsin\beta & 0 \\
+t_xt_z  (1-cos\beta) - t_ysin\beta &
+t_yt_z(1-cos\beta) + t_xsin\beta &
+t_z^2(1-cos\beta) + cos\beta & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$
 
 ## d19 - 坐标系变换：模型空间变换到世界空间
 
