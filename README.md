@@ -1177,7 +1177,24 @@ $$
 
 ## d19 - 坐标系变换：模型空间变换到世界空间
 
-> todo...
+坐标系变换的分类：
+
+- 模型变换：模型变换负责将模型坐标转换成世界坐标。
+- 视图变换：视图变换负责将世界坐标转换成相机坐标。
+- 投影变换：投影变换负责将相机坐标转换成裁剪坐标，也就是将 3D 坐标投影到 2D 平面上。
+
+需要强调一点变换矩阵相乘的顺序，假设最终变换矩阵为 F，模型矩阵为 M， 视图矩阵为 V，投影矩阵为 P，那么有：
+$$
+F = P \times V \times M
+$$$
+这个顺序不能有错，否则效果与预想的会不一致。
+
+### 模型变换
+
+**模型变换公式**：假设模型变换矩阵为 M，其中缩放矩阵为 S，旋转矩阵为 R，平移矩阵为 T，考虑到我们是列主序，所以有如下公式：
+$$
+M = T（平移矩阵） \times R（旋转矩阵） \times S（缩放矩阵）
+$$
 
 ## d20 - 坐标系变换：世界空间变换到观察空间
 
@@ -1185,7 +1202,58 @@ $$
 
 ## d21 - 坐标系变换：观察空间变换到裁剪空间
 
-> todo...
+> 观察空间也称为相机空间。
+
+- 正交投影：又名平行投影，常用在机械制图、施工图纸领域，投影后的比例和投影前的比例一致。
+- 透视投影：多用在成像领域，比如人看世界、相机拍照等场景，这个场景有一个特点就是投影后能够实现近大远小的效果。
+
+### 投影原理
+
+- 首先指定可视范围，即什么范围内的物体能投影。此过程通过指定近平面和远平面来圈定范围。
+- 将可视范围内的所有物体坐标投影到近平面上，投影后的坐标根据相似三角形原理求得，比较简单。
+
+不同之处：
+
+- 正交投影的投影线是平行线，可视范围是一个立方体盒子。
+![正交投影](src/assets/d21_01.awebp)
+
+- 透视投影的投影线是相交线，可视范围是一个棱锥体盒子，这样经过投影后才能达到近大远小的效果。
+![透视投影](src/assets/d21_02.awebp)
+
+正交投影矩阵：
+$$
+\begin{aligned}
+M = \begin{pmatrix}
+\frac{2}{right - left} & 0 & 0 & \frac{right + left}{left - right} \\
+ 0 & \frac{2}{top - bottom} & 0 & \frac{top + bottom}{bottom - top} \\
+ 0 & 0 & \frac{2}{zNear - zFar} & \frac{zFar + zNear}{zNear - zFar}  \\
+ 0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\end{aligned}
+$$
+
+透视投影矩阵：
+$$
+\begin{aligned}
+M = \begin{pmatrix}
+\frac{2 \times zNear}{right - left} & 0 & 0 & \frac{right + left}{left - right} \\
+ 0 & \frac{2 \times zNear}{top - bottom} & 0 & \frac{top + bottom}{bottom - top} \\
+ 0 & 0 & \frac{2(zFar + zNear)}{zNear - zFar} & \frac{2 \times zFar \times zNear}{zNear - zFar}  \\
+ 0 & 0 & -1 & 0
+\end{pmatrix}
+\end{aligned}
+$$
+除了传递以`left 、right、top、bottom`方式传递近平面参数以外，为了方便，业界往往用视角 `fovy` 和宽高比 `aspect` 的方式代替它们，这种方式下的透视投影矩阵为：
+$$
+\begin{aligned}
+M = \begin{pmatrix}
+\frac{2 \times zNear}{right - left} & 0 & 0 & \frac{right + left}{left - right} \\
+ 0 & \frac{2 \times zNear}{top - bottom} & 0 & \frac{top + bottom}{bottom - top} \\
+ 0 & 0 & \frac{2(zFar + zNear)}{zNear - zFar} & \frac{2 \times zFar \times zNear}{zNear - zFar}  \\
+ 0 & 0 & -1 & 0 \\
+\end{pmatrix}
+\end{aligned}
+$$
 
 ## d22 - 更高级的旋转：欧拉角、四元数
 
